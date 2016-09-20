@@ -46,6 +46,8 @@ gerrit plugin for terraform
 
 ## Compile the terraform plugin and run
 
+* Provide credentials with environment vars or _tf_ file
+
     ```
     go build -o terraform-provider-gerrit
     terraform plan

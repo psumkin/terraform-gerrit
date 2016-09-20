@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"golang.org/x/build/gerrit"
+	"github.com/psumkin/golang-build/gerrit"
 )
 
 func resourceGerritProject() *schema.Resource {

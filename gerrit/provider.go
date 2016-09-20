@@ -10,11 +10,35 @@ func Provider() terraform.ResourceProvider {
 
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"base_url": &schema.Schema{
+			"auth": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("GERRIT_BASE_URL", ""),
-				Description: descriptions["base_url"],
+				DefaultFunc: schema.EnvDefaultFunc("GERRIT_AUTH", "noauth"),
+				Description: descriptions["auth"],
+			},
+			"gitCookieFile": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GERRIT_GITCOOKIE_FILE", ""),
+				Description: descriptions["gitCookieFile"],
+			},
+			"password": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GERRIT_PASSWORD", ""),
+				Description: descriptions["password"],
+			},
+			"user": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GERRIT_USER", ""),
+				Description: descriptions["user"],
+			},
+			"url": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GERRIT_URL", ""),
+				Description: descriptions["url"],
 			},
 		},
 
@@ -30,13 +54,21 @@ var descriptions map[string]string
 
 func init() {
 	descriptions = map[string]string{
-		"base_url": "The Gerrit Base API URL",
+		"auth":          "Gerrit authorization: basic|digest|gitcookies|gitcookiefile|noauth",
+		"gitCookieFile": "Filename for Gerrit gitcookiefile authorization",
+		"password":      "Gerrit account password for basic|digest authorization",
+		"url":           "Gerrit API URL",
+		"user":          "Gerrit account username for basic|digest authorization",
 	}
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		BaseURL: d.Get("base_url").(string),
+		Auth:          d.Get("auth").(string),
+		GitCookieFile: d.Get("gitCookieFile").(string),
+		Password:      d.Get("password").(string),
+		User:          d.Get("user").(string),
+		URL:           d.Get("url").(string),
 	}
 
 	return config.Client()

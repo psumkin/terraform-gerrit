@@ -1,17 +1,41 @@
 package gerrit
 
-import "golang.org/x/build/gerrit"
+import (
+	"log"
+	"net/url"
+
+	"github.com/psumkin/golang-build/gerrit"
+)
 
 // Config represents GerritClient configuration
 type Config struct {
-	BaseURL string
-	client  *gerrit.Client
+	Auth, URL, User, Password, GitCookieFile string
+	client                                   *gerrit.Client
 }
 
 // Client configures and returns a fully initialized GerritClient
 func (c *Config) Client() (interface{}, error) {
-	// c.client = gerrit.NewClient(c.BaseURL, gerrit.NoAuth)
-	// c.client = gerrit.NewClient(c.BaseURL, gerrit.BasicAuth("admin", "secret"))
-	c.client = gerrit.NewClient(c.BaseURL, gerrit.BasicAuth("terraform-bot", "terraform-bot"))
+	var a gerrit.Auth
+
+	switch c.Auth {
+	case "basic":
+		a = gerrit.BasicAuth(c.User, c.Password)
+	case "digest":
+		a = gerrit.DigestAuth(c.User, c.Password)
+	case "gitcookies":
+		a = gerrit.GitCookiesAuth()
+	case "gitcookiefile":
+		a = gerrit.GitCookieFileAuth(c.GitCookieFile)
+	case "noauth":
+		a = gerrit.NoAuth
+	default:
+		log.Fatal("[ERROR] unrecognized config auth")
+	}
+
+	if _, err := url.Parse(c.URL); err != nil {
+		log.Fatal("[ERROR] unrecognized config url", err)
+	}
+
+	c.client = gerrit.NewClient(c.URL, a)
 	return *c, nil
 }

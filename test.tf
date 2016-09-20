@@ -1,5 +1,8 @@
 provider "gerrit" {
-    base_url = "http://127.0.1.1:8080"
+    auth = "digest"
+    url = "http://127.0.1.1:8080"
+    user = "tbot"
+    password = "tbot"
 }
 
 resource "gerrit_project" "project_0" {
