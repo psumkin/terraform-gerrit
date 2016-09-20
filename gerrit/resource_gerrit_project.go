@@ -30,13 +30,16 @@ func resourceGerritProject() *schema.Resource {
 }
 
 func resourceGerritProjectCreate(d *schema.ResourceData, m interface{}) error {
+	err := resourceGerritProjectRead(d, m)
+	if err == nil {
+		log.Println("[DEBUG] project already exists")
+		return nil
+	}
+
 	client := m.(Config).client
 	name := d.Get("name").(string)
 
-	log.Println("[DEBUG] #resourceGerritProjectCreate")
-	resourceGerritProjectRead(d, m)
-
-	_, err := client.CreateProject(name, gerrit.ProjectInput{
+	_, err = client.CreateProject(name, gerrit.ProjectInput{
 		Description: d.Get("description").(string),
 	})
 	if err != nil {
@@ -69,6 +72,10 @@ func resourceGerritProjectUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceGerritProjectDelete(d *schema.ResourceData, m interface{}) error {
-	// TODO: implement
+	// TODO: implement Delete as update for rename?
+	err := resourceGerritProjectRead(d, m)
+	if err != nil {
+		return err
+	}
 	return nil
 }
